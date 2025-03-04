@@ -29,32 +29,32 @@ def load_library():
 
 # this code Python version of the conversion 
 def convert_RGB_to_YCbCr(rgb_pixels, width, height):
-    
+
+    ycc_pixels = bytearray(width * height * 3)
+
     # recall the pixels are in row major order
     # and that there are 3 bytes per pixel in r,g,b order 
 
     # Your code goes here. do not use any libraries. 
 
-    ycc_pixels = bytearray(width * height * 3)
-    
-    for i in range(width * height):
-        r = rgb_pixels[3 * i]
-        g = rgb_pixels[3 * i + 1]
-        b = rgb_pixels[3 * i + 2]
+    total_Pixels = width * height
 
-        # Apply the BT.601 conversion formula
-        y  = int(round(0.299 * r + 0.587 * g + 0.114 * b))
+    for i in range(total_Pixels):
+        
+        r = rgb_pixels[3*i]
+        g = rgb_pixels[3*i + 1]
+        b = rgb_pixels[3*i + 2]
+
+        # Python is dynamically typed so variable types are not explicitly declares 
+        # Python automatically handles type conversion and memory management.
+        y = int(round(0.299 * r + 0.587 * g + 0.114 * b))
+        cr = int(round(128 + 0.5 * r - 0.418688 * g - 0.081312 * b)) 
         cb = int(round(128 - 0.168736 * r - 0.331264 * g + 0.5 * b))
-        cr = int(round(128 + 0.5 * r - 0.418688 * g - 0.081312 * b))
 
-        # Y (Luma) ranges from 16 to 235
-        ycc_pixels[3 * i] = max(16, min(235, y))
-
-        # Cb (Blue minus Luma) ranges from 16 to 240
-        ycc_pixels[3 * i + 1] = max(16, min(240, cb))
-
-        # Cr (Red minus Luma) ranges from 16 to 240
-        ycc_pixels[3 * i + 2] = max(16, min(240, cr))
+        # Clamping ranges for YCrCb
+        ycc_pixels[3*i]     = max(0, min(y, 255))
+        ycc_pixels[3*i + 1] = max(0, min(cr, 255))
+        ycc_pixels[3*i + 2] = max(0, min(cb, 255))
     
     return ycc_pixels
 
